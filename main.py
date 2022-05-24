@@ -1,37 +1,24 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, File
 from pydantic import BaseModel
-
-import redis_queue
-from worker import work
-from rq import job
-from rq.registry import FinishedJobRegistry
+from queue_manager import QueueManager
 
 ENQUEUE_URL = '/enqueue'
 PULL_URL = '/pullCompleted'
 
+queue = QueueManager()
 app = FastAPI()
 
 
 class BinaryData(BaseModel):
-    data: str
+    data: bytes
 
 
 @app.put(path=ENQUEUE_URL)
-async def enqueue(iterations: int, buffer: BinaryData):
-    jobInstance = redis_queue.queue.enqueue(work, iterations=iterations, buffer=buffer, results_ttl=-1)
+async def enqueue(iterations: int, data: bytes = File()):
+    jobInstance = queue.enqueue(iterations=iterations, data=data)
     return {'Work ID': jobInstance.id}
 
 
 @app.post(path=PULL_URL)
 async def pullCompleted(top: int):
-    jobIds = FinishedJobRegistry(connection=redis_queue.connection).get_job_ids()[-top:]
-    results = []
-
-    for jobId in jobIds:
-        results.append(
-            {
-                'Word ID': jobId,
-                'Value': job.Job.fetch(id=jobId).result
-            })
-
-    return results
+    return queue.getCompleted(limit=top)
