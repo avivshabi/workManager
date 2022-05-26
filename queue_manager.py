@@ -1,12 +1,12 @@
 import os
-from redis import Redis
+from redis import RedisCluster
 from rq import Queue, job, Connection, Worker
 from worker import work
 
 
 class QueueManager:
     def __init__(self):
-        self._conn = Redis(
+        self._conn = RedisCluster(
             host=os.getenv('REDIS_HOST', '0.0.0.0'),
             port=os.getenv('REDIS_PORT', 6379),
             password=os.getenv('REDIS_PASSWORD', ''),
