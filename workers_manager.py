@@ -2,6 +2,9 @@ import os
 import boto3
 from requests import get
 from queue_manager import QueueManager
+from dotenv import load_dotenv
+
+load_dotenv()
 
 if 'HOST_IP' not in os.environ:
     os.environ['HOST_IP'] = get('https://api.ipify.org').content.decode('utf8')
@@ -9,12 +12,12 @@ if 'HOST_IP' not in os.environ:
 userData = f"""#!/bin/bash
 sudo apt -y update
 sudo apt -y install python3-pip
-pip3 install redis
 sudo apt -y install python3-rq
 export RQ_CONNECTION_CLASS="redis.RedisCluster"
+export REDIS_HOST={os.environ['HOST_IP']}
 git clone https://github.com/avivshabi/workManager.git app
 cd app
-rq worker --burst --url redis://{os.getenv('HOST_IP')}
+python worker.py
 shutdown -h now
 """
 
