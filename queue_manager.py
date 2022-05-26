@@ -1,6 +1,6 @@
 import os
 from redis import RedisCluster
-from rq import Queue, job, Connection, Worker
+from rq import Queue, job, Worker
 from worker import work
 
 
@@ -21,15 +21,14 @@ class QueueManager:
         results = []
 
         if limit > 0:
-            with Connection():
-                jobIds = self._completed.get_job_ids()[-limit:]
+            jobIds = self._completed.get_job_ids()[-limit:]
 
-                for jobId in jobIds:
-                    results.append(
-                        {
-                            'Word ID': jobId,
-                            'Value': job.Job.fetch(id=jobId).result.hex()
-                        })
+            for jobId in jobIds:
+                results.append(
+                    {
+                        'Word ID': jobId,
+                        'Value': job.Job.fetch(id=jobId).result.hex()
+                    })
 
         return results
 
