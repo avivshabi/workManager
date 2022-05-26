@@ -12,12 +12,12 @@ if 'HOST_IP' not in os.environ:
 userData = f"""#!/bin/bash
 sudo apt -y update
 sudo apt -y install python3-pip
-sudo apt -y install python3-rq
 export RQ_CONNECTION_CLASS="redis.RedisCluster"
 export REDIS_HOST={os.environ['HOST_IP']}
 git clone https://github.com/avivshabi/workManager.git app
 cd app
-python worker.py
+pip3 install -r requirements.txt --upgrade
+python3 worker.py
 shutdown -h now
 """
 
