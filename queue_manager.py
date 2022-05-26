@@ -1,7 +1,7 @@
 import os
 from redis import RedisCluster
-from rq import Queue, job, Worker
-from worker import work
+from rq import Queue, job, Worker, Connection
+from hash import compute
 
 
 class QueueManager:
@@ -15,20 +15,21 @@ class QueueManager:
         self._completed = self._queue.finished_job_registry
 
     def enqueue(self, iterations: int, data: bytes):
-        return self._queue.enqueue(work, iterations=iterations, buffer=data, result_ttl=-1)
+        return self._queue.enqueue(compute, iterations=iterations, buffer=data, result_ttl=-1)
 
     def getCompleted(self, limit):
         results = []
 
-        if limit > 0:
-            jobIds = self._completed.get_job_ids()[-limit:]
+        with Connection(connection=self._conn):
+            if limit > 0:
+                jobIds = self._completed.get_job_ids()[-limit:]
 
-            for jobId in jobIds:
-                results.append(
-                    {
-                        'Word ID': jobId,
-                        'Value': job.Job.fetch(id=jobId).result.hex()
-                    })
+                for jobId in jobIds:
+                    results.append(
+                        {
+                            'Word ID': jobId,
+                            'Value': job.Job.fetch(id=jobId).result.hex()
+                        })
 
         return results
 
