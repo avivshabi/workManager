@@ -1,6 +1,5 @@
 import os
 import boto3
-from time import sleep
 from requests import get
 from queue_manager import QueueManager
 
@@ -9,7 +8,12 @@ if 'HOST_IP' not in os.environ:
 
 userData = f"""#!/bin/bash
 sudo apt -y update
+sudo apt -y install python3-pip
+pip3 install redis
 sudo apt -y install python3-rq
+export RQ_CONNECTION_CLASS="redis.RedisCluster"
+git clone https://github.com/avivshabi/workManager.git app
+cd app
 rq worker --burst --url redis://{os.getenv('HOST_IP')}
 shutdown -h now
 """
@@ -47,7 +51,4 @@ class WorkersManager:
 
 if __name__ == '__main__':
     manager = WorkersManager()
-
-    while True:
-        manager.addWorkers()
-        sleep(180)
+    manager.addWorkers()
