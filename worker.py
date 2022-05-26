@@ -1,8 +1,17 @@
-def work(buffer, iterations):
-    import hashlib
-    output = hashlib.sha512(buffer).digest()
+import os
 
-    for i in range(iterations - 1):
-        output = hashlib.sha512(output).digest()
+from redis import RedisCluster
+from rq import Worker, Queue, Connection
 
-    return output
+listen = ['high', 'default', 'low']
+
+conn = RedisCluster(
+    host=os.getenv('REDIS_HOST', '0.0.0.0'),
+    port=os.getenv('REDIS_PORT', 6379),
+    password=os.getenv('REDIS_PASSWORD', ''),
+)
+
+if __name__ == '__main__':
+    with Connection(connection=conn):
+        worker = Worker(map(Queue, listen))
+        worker.work()
