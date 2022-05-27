@@ -1,17 +1,35 @@
 import os
+import sched
 
 from redis import RedisCluster
 from rq import Worker, Queue, Connection
 
+ATTEMPTS = 10
+WORKERS_DELAY = 45
 listen = ['high', 'default', 'low']
-
+scheduler = sched.scheduler()
 conn = RedisCluster(
     host=os.getenv('REDIS_HOST', '0.0.0.0'),
     port=os.getenv('REDIS_PORT', 6379),
     password=os.getenv('REDIS_PASSWORD', ''),
 )
 
-if __name__ == '__main__':
+
+def execute(attempts=-1):
+    if attempts < 0:
+        return
+
     with Connection(connection=conn):
         worker = Worker(map(Queue, listen))
-        worker.work()
+        scheduler.enter(
+            delay=WORKERS_DELAY,
+            priority=0,
+            action=execute,
+            kwargs={
+                'attempts': (ATTEMPTS if worker.work(burst=True) else attempts - 1)
+            }
+        )
+
+
+if __name__ == '__main__':
+    execute(attempts=ATTEMPTS)
