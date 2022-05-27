@@ -13,14 +13,16 @@ conn = RedisCluster(
     port=os.getenv('REDIS_PORT', 6379),
     password=os.getenv('REDIS_PASSWORD', ''),
 )
+worker = Worker(map(Queue, listen))
 
 
 def execute(attempts=-1):
+    global worker
+
     if attempts < 0:
         return
 
     with Connection(connection=conn):
-        worker = Worker(map(Queue, listen))
         scheduler.enter(
             delay=WORKERS_DELAY,
             priority=0,
@@ -38,7 +40,7 @@ if __name__ == '__main__':
         priority=0,
         action=execute,
         kwargs={
-            'attempts':ATTEMPTS
+            'attempts': ATTEMPTS
         }
     )
     scheduler.run()
