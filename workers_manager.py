@@ -1,5 +1,6 @@
 import os
 import sched
+import time
 
 import boto3
 from requests import get
@@ -62,6 +63,7 @@ def balance():
         manager.addWorkers()
     except:
         delay = 0
+        time.sleep(LOAD_BALANCE_DELAY / 3)
     finally:
         scheduler.enter(delay=delay, priority=0, action=balance)
         scheduler.run()
