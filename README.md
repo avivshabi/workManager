@@ -87,9 +87,9 @@ through specific ports).
 
 #### Hardware failure -
 
-Hardware failure such as Network failures and other hardware components often occur due to lots of diverse reasons  
-(earthquakes, terror attack, electricity shortage, etc.). In order to protect our system from such failures,  
-we should have a redundancy in every component we use.  
+Hardware failure such as Network failures and other hardware components often occur due to lots of diverse  
+reasons (earthquakes, terror attack, electricity shortage, etc.).  
+In order to protect our system from such failures, we should have a redundancy in every component we use.  
 Additionally, we should have backups and replication of our system in multiple availability zones.  
 
 #### Software failure -
