@@ -3,7 +3,7 @@ A simple Queue & Work Management system using AWS EC2 instances only.
 The Queue consists of 2 fully seperated nodes that sync the data between them (redundancy).  
 In addition to the Server Application, each node runs a scheduled script to creates worker nodes as needed.
 
-## Run Locally (with a remote DynamoDB table)
+## Run Locally 
 
 Please make sure you have installed and configured AWS CLI on your local machine.  
 Note: You should have access to a RedisCluster (Local or Remote)  
