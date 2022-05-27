@@ -20,9 +20,10 @@ class QueueManager:
     def getCompleted(self, limit):
         results = []
 
-        for node in self._conn.get_primaries():
-            if limit > 0:
-                jobIds = FinishedJobRegistry(connection=node.redis_connection).get_job_ids()[-limit:]
+        if limit > 0:
+            for node in self._conn.get_primaries():
+                conn = RedisCluster(host=node.host, port=node.port)
+                jobIds = FinishedJobRegistry(connection=conn).get_job_ids()[-limit:]
 
                 for jobId in jobIds:
                     results.append({
