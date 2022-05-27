@@ -25,10 +25,13 @@ class QueueManager:
                 jobIds = self._completed.get_job_ids()[-limit:]
 
                 for jobId in jobIds:
-                    results.append({
-                        'Work ID': jobId,
-                        'Value': job.Job.fetch(id=jobId).result.hex()
-                    })
+                    try:
+                        results.append({
+                            'Work ID': jobId,
+                            'Value': job.Job.fetch(id=jobId).result.hex()
+                        })
+                    except:
+                        continue
 
         return results
 
