@@ -1,4 +1,6 @@
 import os
+import sched
+
 import boto3
 from requests import get
 from queue_manager import QueueManager
@@ -22,6 +24,8 @@ shutdown -h now
 """
 
 JOBS_PER_WORKER = 10000
+LOAD_BALANCE_DELAY = 300
+scheduler = sched.scheduler()
 
 
 class WorkersManager:
@@ -52,6 +56,11 @@ class WorkersManager:
                 InstanceInitiatedShutdownBehavior='terminate')
 
 
-if __name__ == '__main__':
+def balance():
     manager = WorkersManager()
     manager.addWorkers()
+    scheduler.enter(delay=LOAD_BALANCE_DELAY, priority=0, action=balance)
+
+
+if __name__ == '__main__':
+    balance()
