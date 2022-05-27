@@ -56,10 +56,15 @@ class WorkersManager:
 
 
 def balance():
-    manager = WorkersManager()
-    manager.addWorkers()
-    scheduler.enter(delay=LOAD_BALANCE_DELAY, priority=0, action=balance)
-    scheduler.run()
+    delay = LOAD_BALANCE_DELAY
+    try:
+        manager = WorkersManager()
+        manager.addWorkers()
+    except:
+        delay = 0
+    finally:
+        scheduler.enter(delay=delay, priority=0, action=balance)
+        scheduler.run()
 
 
 if __name__ == '__main__':
