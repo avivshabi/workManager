@@ -29,7 +29,16 @@ def execute(attempts=-1):
                 'attempts': (ATTEMPTS if worker.work(burst=True) else attempts - 1)
             }
         )
+        scheduler.run()
 
 
 if __name__ == '__main__':
-    execute(attempts=ATTEMPTS)
+    scheduler.enter(
+        delay=0,
+        priority=0,
+        action=execute,
+        kwargs={
+            'attempts':ATTEMPTS
+        }
+    )
+    scheduler.run()

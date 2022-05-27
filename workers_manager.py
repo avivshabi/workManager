@@ -19,8 +19,7 @@ export REDIS_HOST={os.environ['HOST_IP']}
 git clone https://github.com/avivshabi/workManager.git app
 cd app
 pip3 install -r requirements.txt --upgrade
-python3 worker.py
-shutdown -h now
+python3 worker.py && shutdown -h now
 """
 
 JOBS_PER_WORKER = 10000
@@ -60,7 +59,9 @@ def balance():
     manager = WorkersManager()
     manager.addWorkers()
     scheduler.enter(delay=LOAD_BALANCE_DELAY, priority=0, action=balance)
+    scheduler.run()
 
 
 if __name__ == '__main__':
-    balance()
+    scheduler.enter(delay=0, priority=0, action=balance)
+    scheduler.run()
